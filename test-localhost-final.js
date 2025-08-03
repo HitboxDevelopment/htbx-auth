@@ -1,4 +1,5 @@
 const { SecureAuth } = require('./auth');
+const crypto = require('crypto');
 
 /**
  * Final test to verify localhost functionality with new endpoints
@@ -9,10 +10,13 @@ async function testLocalhostFinal() {
   const auth = new SecureAuth(); // Uses localhost:3001
   
   try {
+    // Generate UUID for this session
+    const uuid = crypto.randomUUID();
+    console.log('🆔 Generated UUID:', uuid);
 
     // Test 1: Register with /register/init
     console.log('\n=== Test 1: Register with /register/init ===');
-    await auth.connectForRegister(
+    await auth.connectForRegister(uuid,
       (message) => {
         console.log('📨 Register response:', message);
         console.log('🔓 Decrypted register response:', JSON.stringify(message, null, 2));
@@ -31,7 +35,7 @@ async function testLocalhostFinal() {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (auth.isConnected()) {
-      await auth.submitRegister('newuser', 'newpassword', 'newuser@example.com');
+      await auth.submitRegister(uuid, 'newuser', 'newpassword', 'newuser@example.com');
     }
     await new Promise(resolve => setTimeout(resolve, 2000));
     console.log('⏳ Waiting for response...');
@@ -39,7 +43,7 @@ async function testLocalhostFinal() {
 
     // Test 2: Login with /login/init
     console.log('=== Test 2: Login with /login/init ===');
-    await auth.connectForLogin(
+    await auth.connectForLogin(uuid,
       (message) => {
         console.log('📨 Login response:', message);
         console.log('🔓 Decrypted login response:', JSON.stringify(message, null, 2));
@@ -59,7 +63,7 @@ async function testLocalhostFinal() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (auth.isConnected()) {
       console.log('🔐 Attempting login with credentials: newuser / newpassword');
-      await auth.submitLogin('newuser', 'newpassword');
+      await auth.submitLogin(uuid, 'newuser', 'newpassword');
     }
     await new Promise(resolve => setTimeout(resolve, 3000));
     console.log('⏳ Waiting for response...');

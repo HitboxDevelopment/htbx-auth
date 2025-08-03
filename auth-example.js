@@ -1,4 +1,5 @@
 const { SecureAuth, cryptoUtils } = require('./auth');
+const crypto = require('crypto');
 
 /**
  * Example usage of the SecureAuth module
@@ -16,8 +17,12 @@ async function exampleUsage() {
   console.log('=== Example 3: Separate Login and Register Functions ===');
   
   try {
+    // Generate UUID for this session
+    const uuid = crypto.randomUUID();
+    console.log('🆔 Generated UUID:', uuid);
+    
     // Connect for login using custom auth server
-    await auth2.connectForLogin(
+    await auth2.connectForLogin(uuid,
       // onMessage callback
       (decryptedMessage) => {
         console.log('Login response:', decryptedMessage);
@@ -40,7 +45,7 @@ async function exampleUsage() {
 
     // Submit login credentials
     if (auth2.isConnected()) {
-      await auth2.submitLogin('testuser', 'testpassword');
+      await auth2.submitLogin(uuid, 'testuser', 'testpassword');
     }
 
     // Get logs
@@ -64,8 +69,12 @@ async function registrationExample() {
   const auth = new SecureAuth('https://auth.hitboxgames.online');
   
   try {
+    // Generate UUID for this session
+    const uuid = crypto.randomUUID();
+    console.log('🆔 Generated UUID:', uuid);
+    
     // Connect to WebSocket server for registration
-    await auth.connectForRegister(
+    await auth.connectForRegister(uuid,
       // onMessage callback
       (decryptedMessage) => {
         console.log('Registration response:', decryptedMessage);
@@ -90,7 +99,7 @@ async function registrationExample() {
 
     // Submit registration credentials
     if (auth.isConnected()) {
-      await auth.submitRegister('newuser123', 'securepassword123', 'newuser@example.com');
+      await auth.submitRegister(uuid, 'newuser123', 'securepassword123', 'newuser@example.com');
     }
 
     // Get logs
@@ -113,9 +122,13 @@ async function completeFlowExample() {
   const auth = new SecureAuth(); // Uses localhost:3001
   
   try {
+    // Generate UUID for this session
+    const uuid = crypto.randomUUID();
+    console.log('🆔 Generated UUID:', uuid);
+    
     // First, try to register a new user
     console.log('📝 Step 1: Registering new user...');
-    await auth.connectForRegister(
+    await auth.connectForRegister(uuid,
       (message) => {
         console.log('Register response:', message);
         if (message.type === 'success') {
@@ -124,7 +137,7 @@ async function completeFlowExample() {
           setTimeout(async () => {
             try {
               await auth.close(); // Close register connection
-              await auth.connectForLogin(
+              await auth.connectForLogin(uuid,
                 (loginMessage) => {
                   console.log('Login response:', loginMessage);
                   if (loginMessage.type === 'success') {
@@ -137,7 +150,7 @@ async function completeFlowExample() {
               
               await new Promise(resolve => setTimeout(resolve, 1000));
               if (auth.isConnected()) {
-                await auth.submitLogin('newuser123', 'securepassword123');
+                await auth.submitLogin(uuid, 'newuser123', 'securepassword123');
               }
             } catch (error) {
               console.error('Login attempt failed:', error);
@@ -151,7 +164,7 @@ async function completeFlowExample() {
 
     await new Promise(resolve => setTimeout(resolve, 1000));
     if (auth.isConnected()) {
-      await auth.submitRegister('newuser123', 'securepassword123', 'newuser@example.com');
+      await auth.submitRegister(uuid, 'newuser123', 'securepassword123', 'newuser@example.com');
     }
 
     // Wait for the flow to complete
@@ -172,7 +185,7 @@ async function cryptoExample() {
   
   try {
     // Generate a new UUID
-    const uuid = cryptoUtils.generateUUID();
+    const uuid = crypto.randomUUID();
     console.log('Generated UUID:', uuid);
 
     // Generate ephemeral key pair
@@ -209,7 +222,6 @@ async function standaloneExample() {
   console.log('\n=== Example 5: Standalone Functions ===');
   
   const { 
-    generateUUID, 
     generateEphemeralKey, 
     exportPublicKey,
     encrypt,
@@ -218,7 +230,7 @@ async function standaloneExample() {
 
   try {
     // Use functions directly
-    const uuid = generateUUID();
+    const uuid = crypto.randomUUID();
     console.log('Standalone UUID:', uuid);
 
     const keyPair = await generateEphemeralKey();

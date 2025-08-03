@@ -104,10 +104,11 @@ async function register() {
 ### Using Individual Functions
 
 ```javascript
-const { generateUUID, encrypt, decrypt } = require('./auth');
+const { encrypt, decrypt } = require('./auth');
+const crypto = require('crypto');
 
 // Generate a UUID
-const uuid = generateUUID();
+const uuid = crypto.randomUUID();
 
 // Encrypt/decrypt data
 const key = await crypto.subtle.generateKey(
@@ -140,38 +141,46 @@ const auth = new SecureAuth('https://auth.hitboxgames.online');
 
 #### Methods
 
-##### `connectWebSocket(onMessage, onError, onClose)`
+##### `connectWebSocket(uuid, onMessage, onError, onClose)`
 
 Establishes a secure WebSocket connection to the authentication server (legacy method, uses login endpoint).
 
+- `uuid` (string): The UUID for this session
 - `onMessage(message)`: Callback for received messages
 - `onError(error)`: Callback for connection errors
 - `onClose()`: Callback when connection closes
 
-##### `connectForLogin(onMessage, onError, onClose)`
+##### `connectForLogin(uuid, onMessage, onError, onClose)`
 
 Establishes a secure WebSocket connection to the login server endpoint.
 
+- `uuid` (string): The UUID for this session
 - `onMessage(message)`: Callback for received messages
 - `onError(error)`: Callback for connection errors
 - `onClose()`: Callback when connection closes
 
-##### `connectForRegister(onMessage, onError, onClose)`
+##### `connectForRegister(uuid, onMessage, onError, onClose)`
 
 Establishes a secure WebSocket connection to the register server endpoint.
 
+- `uuid` (string): The UUID for this session
 - `onMessage(message)`: Callback for received messages
 - `onError(error)`: Callback for connection errors
 - `onClose()`: Callback when connection closes
 
-##### `submitLogin(username, password)`
+##### `submitLogin(uuid, username, password)`
 
 Submits login credentials securely.
 
-##### `submitRegister(username, password, email)`
+- `uuid` (string): The UUID for this session
+- `username` (string): The username for login
+- `password` (string): The password for login
+
+##### `submitRegister(uuid, username, password, email)`
 
 Submits registration credentials securely.
 
+- `uuid` (string): The UUID for this session
 - `username` (string): The username for registration
 - `password` (string): The password for registration  
 - `email` (string, optional): The email address for registration
@@ -194,11 +203,9 @@ Clears the log array.
 
 ### Crypto Utilities
 
-#### `generateUUID()`
-
-Generates a cryptographically secure UUID.
-
 #### `generateEphemeralKey()`
+
+Generates an ECDH key pair for secure key exchange.
 
 Generates an ECDH key pair for secure key exchange.
 

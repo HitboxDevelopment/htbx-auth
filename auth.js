@@ -10,7 +10,6 @@ class SecureAuth {
     this.ws = null;
     this.sharedSecret = null;
     this.clientKeys = null;
-    this.uuid = crypto.randomUUID();
     this.logs = [];
   }
 
@@ -25,9 +24,9 @@ class SecureAuth {
   /**
    * Fetch WebSocket URL for login from server
    */
-  async fetchLoginWsUrl() {
+  async fetchLoginWsUrl(uuid) {
     try {
-      const res = await fetch(`${this.authServer}/login/init?uuid=${this.uuid}`);
+      const res = await fetch(`${this.authServer}/login/init?uuid=${uuid}`);
       const data = await res.json();
       if (!data.wsUrl) throw new Error("No wsUrl in response");
       return data.wsUrl;
@@ -40,9 +39,9 @@ class SecureAuth {
   /**
    * Fetch WebSocket URL for register from server
    */
-  async fetchRegisterWsUrl() {
+  async fetchRegisterWsUrl(uuid) {
     try {
-      const res = await fetch(`${this.authServer}/register/init?uuid=${this.uuid}`);
+      const res = await fetch(`${this.authServer}/register/init?uuid=${uuid}`);
       const data = await res.json();
       if (!data.wsUrl) throw new Error("No wsUrl in response");
       return data.wsUrl;
@@ -158,9 +157,9 @@ class SecureAuth {
   /**
    * Connect to WebSocket server and establish secure channel
    */
-  async connectWebSocket(onMessage, onError, onClose) {
+  async connectWebSocket(uuid, onMessage, onError, onClose) {
     try {
-      const wsUrl = await this.fetchLoginWsUrl();
+      const wsUrl = await this.fetchLoginWsUrl(uuid);
       this.clientKeys = await this.generateEphemeralKey();
       const clientPub = await this.exportPublicKey(this.clientKeys.publicKey);
 
@@ -228,9 +227,9 @@ class SecureAuth {
   /**
    * Connect to WebSocket server for login and establish secure channel
    */
-  async connectForLogin(onMessage, onError, onClose) {
+  async connectForLogin(uuid, onMessage, onError, onClose) {
     try {
-      const wsUrl = await this.fetchLoginWsUrl();
+      const wsUrl = await this.fetchLoginWsUrl(uuid);
       this.clientKeys = await this.generateEphemeralKey();
       const clientPub = await this.exportPublicKey(this.clientKeys.publicKey);
 
@@ -298,9 +297,9 @@ class SecureAuth {
   /**
    * Connect to WebSocket server for registration and establish secure channel
    */
-  async connectForRegister(onMessage, onError, onClose) {
+  async connectForRegister(uuid, onMessage, onError, onClose) {
     try {
-      const wsUrl = await this.fetchRegisterWsUrl();
+      const wsUrl = await this.fetchRegisterWsUrl(uuid);
       this.clientKeys = await this.generateEphemeralKey();
       const clientPub = await this.exportPublicKey(this.clientKeys.publicKey);
 
@@ -368,13 +367,13 @@ class SecureAuth {
   /**
    * Submit login credentials
    */
-  async submitLogin(username, password) {
+  async submitLogin(uuid, username, password) {
     if (!this.ws || !this.sharedSecret) {
       this.log("🔒 Shared secret not ready");
       throw new Error("Shared secret not ready");
     }
 
-    const creds = JSON.stringify({ type: "login", username, password, uuid: this.uuid });
+    const creds = JSON.stringify({ type: "login", username, password, uuid: uuid });
     const encrypted = await this.encrypt(creds, this.sharedSecret);
     this.ws.send(JSON.stringify(encrypted));
     this.log("📤 Attempting login...");
@@ -383,7 +382,7 @@ class SecureAuth {
   /**
    * Submit registration credentials
    */
-  async submitRegister(username, password, email = null) {
+  async submitRegister(uuid, username, password, email = null) {
     if (!this.ws || !this.sharedSecret) {
       this.log("🔒 Shared secret not ready");
       throw new Error("Shared secret not ready");
@@ -393,7 +392,7 @@ class SecureAuth {
       type: "register", 
       username, 
       password, 
-      uuid: this.uuid 
+      uuid: uuid 
     };
     
     // Add email if provided
@@ -441,11 +440,6 @@ class SecureAuth {
 
 // Export individual functions for standalone use
 const cryptoUtils = {
-  /**
-   * Generate a new UUID
-   */
-  generateUUID: () => crypto.randomUUID(),
-
   /**
    * Generate ephemeral ECDH key pair
    */
@@ -554,7 +548,6 @@ module.exports = {
   cryptoUtils,
   
   // Convenience exports
-  generateUUID: cryptoUtils.generateUUID,
   generateEphemeralKey: cryptoUtils.generateEphemeralKey,
   exportPublicKey: cryptoUtils.exportPublicKey,
   importPublicKey: cryptoUtils.importPublicKey,
