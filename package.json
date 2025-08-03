@@ -1,0 +1,34 @@
+{
+  "name": "secure-auth-module",
+  "version": "1.0.0",
+  "description": "Secure authentication module with end-to-end encryption",
+  "main": "auth.js",
+  "scripts": {
+    "test": "node auth-example.js",
+    "start": "node auth-example.js"
+  },
+  "keywords": [
+    "authentication",
+    "encryption",
+    "websocket",
+    "security",
+    "login",
+    "crypto"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "your-repository-url"
+  },
+  "bugs": {
+    "url": "your-repository-url/issues"
+  },
+  "homepage": "your-repository-url#readme"
+} 
