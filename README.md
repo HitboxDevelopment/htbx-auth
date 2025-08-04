@@ -65,7 +65,7 @@ async function login() {
     auth.close();
   }
 }
-
+```
 ### Registration Example
 
 ```javascript
