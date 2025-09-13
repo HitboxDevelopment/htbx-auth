@@ -1,12 +1,8 @@
 {
-  "name": "secure-auth-module",
+  "name": "@hitbox/htbx-auth",
   "version": "1.0.0",
   "description": "Secure authentication module with end-to-end encryption",
   "main": "auth.js",
-  "scripts": {
-    "test": "node auth-example.js",
-    "start": "node auth-example.js"
-  },
   "keywords": [
     "authentication",
     "encryption",
@@ -15,8 +11,8 @@
     "login",
     "crypto"
   ],
-  "author": "Your Name",
-  "license": "MIT",
+  "author": "Fierra",
+  "license": "GPLv3",
   "dependencies": {
     "ws": "^8.14.2"
   },
@@ -25,10 +21,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "your-repository-url"
-  },
-  "bugs": {
-    "url": "your-repository-url/issues"
-  },
-  "homepage": "your-repository-url#readme"
+    "url": "https://github.com/HitboxDevelopment/htbx-auth"
+  }
 } 
