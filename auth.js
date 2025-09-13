@@ -199,7 +199,11 @@ class SecureAuth {
               onMessage(decrypted);
             }
           } else if (parsedData.type === "error") {
-            this.log(`❗ Error: ${parsedData.message}`);
+            // Sanitize user-supplied error message to prevent log injection
+            const sanitizedMessage = typeof parsedData.message === "string"
+              ? parsedData.message.replace(/[\r\n]+/g, " ")
+              : "";
+            this.log(`❗ Error: ${sanitizedMessage}`);
             this.ws.close();
           }
         } catch (err) {
