@@ -5,7 +5,7 @@ const WebSocket = require('ws');
  * Authentication module for secure login functionality
  */
 class SecureAuth {
-  constructor(authServer = 'http://localhost:3001') {
+  constructor(authServer = 'https://auth.hitboxgames.online') {
     this.authServer = authServer;
     this.ws = null;
     this.sharedSecret = null;
